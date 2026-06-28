@@ -34,6 +34,40 @@ function createThemeToggle() {
   document.body.appendChild(btn);
 }
 
+function createStartOverlay() {
+  const overlay = document.createElement("div");
+  overlay.className = "start-overlay";
+  overlay.innerHTML = '<button class="start-btn" type="button">开启</button>';
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function safePlay(audio) {
+  if (!audio || !audio.querySelector("source")?.src) {
+    return Promise.resolve(false);
+  }
+
+  return audio.play()
+    .then(() => true)
+    .catch((err) => {
+      console.warn("Music playback skipped:", err.message);
+      return false;
+    });
+}
+
+function resetAudio(audio, shouldPlay) {
+  if (!audio) return;
+
+  audio.pause();
+  try {
+    audio.currentTime = 0;
+  } catch (err) {
+    console.warn("Music reset skipped:", err.message);
+  }
+
+  if (shouldPlay) safePlay(audio);
+}
+
 // ── Script Loader ────────────────────────────────────────────────
 function loadScript(src) {
   return new Promise((resolve, reject) => {
@@ -49,6 +83,7 @@ function loadScript(src) {
 document.addEventListener("DOMContentLoaded", async () => {
   applyTheme(currentMode);
   createThemeToggle();
+  const startOverlay = createStartOverlay();
 
   // Set music source
   const audio = document.querySelector(".song");
@@ -83,29 +118,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     rendered.push({ el, comp, section });
   });
 
-  // SweetAlert music prompt
-  const isDark = currentMode === "dark";
-  Swal.fire({
-    title: "Play music in the background?",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonColor: CONFIG.colors.accent || "#3085d6",
-    cancelButtonColor: "#888",
-    confirmButtonText: "Yes!",
-    cancelButtonText: "No",
-    background: isDark ? "#1e293b" : "#ffffff",
-    color: isDark ? "#f1f5f9" : "#1e293b",
-  }).then((result) => {
-    if (result.isConfirmed && audio) {
-      audio.play().catch(() => {});
-    }
-    buildTimeline(rendered);
+  if (!window.gsap) {
+    console.error("GSAP is required but was not loaded.");
+    return;
+  }
+
+  const tl = buildTimeline(rendered, audio);
+  const startBtn = startOverlay.querySelector(".start-btn");
+  startBtn.addEventListener("click", () => {
+    startBtn.disabled = true;
+    safePlay(audio);
+    startOverlay.classList.add("is-hidden");
+    tl.restart(true);
   });
 });
 
 // ── Timeline Builder ─────────────────────────────────────────────
-function buildTimeline(rendered) {
-  const tl = gsap.timeline();
+function buildTimeline(rendered, audio) {
+  const tl = gsap.timeline({ paused: true });
 
   tl.to(".container", { duration: 0.6, visibility: "visible" });
 
@@ -122,6 +152,7 @@ function buildTimeline(rendered) {
     }
 
     // Animate
+    tl.set(el, { visibility: "visible" });
     comp.animate(tl, el, CONFIG);
 
     // Handle exit lifecycle
@@ -143,6 +174,12 @@ function buildTimeline(rendered) {
   // Setup replay
   const replayBtn = document.getElementById("replay");
   if (replayBtn) {
-    replayBtn.addEventListener("click", () => tl.restart());
+    replayBtn.addEventListener("click", () => {
+      gsap.set(replayBtn, { pointerEvents: "none" });
+      resetAudio(audio, true);
+      tl.restart(true);
+    });
   }
+
+  return tl;
 }

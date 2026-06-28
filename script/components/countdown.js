@@ -26,17 +26,17 @@
 
       nums.forEach((num) => {
         tl.fromTo(num,
-          { scale: 0, opacity: 0, rotation: -180 },
-          { scale: 1, opacity: 1, rotation: 0, duration: 0.5, ease: "back.out(1.7)" }
+          { scale: 0.97, opacity: 0, y: 12 },
+          { scale: 1, opacity: 1, y: 0, duration: 0.85, ease: "power2.out" }
         )
-        .to(num, { scale: 2, opacity: 0, duration: 0.4 }, "+=0.8");
+        .to(num, { scale: 1.02, opacity: 0, y: -12, duration: 0.75, ease: "power2.inOut" }, "+=0.45");
       });
 
       tl.fromTo(go,
-        { scale: 0, opacity: 0 },
-        { scale: 1.2, opacity: 1, duration: 0.6, ease: "elastic.out(1, 0.5)" }
+        { scale: 0.97, opacity: 0, y: 12 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.9, ease: "power2.out" }
       )
-      .to(go, { scale: 0, opacity: 0, duration: 0.4 }, "+=1.5");
+      .to(go, { scale: 1.02, opacity: 0, y: -12, duration: 0.75, ease: "power2.inOut" }, "+=1.2");
     },
   };
 })();

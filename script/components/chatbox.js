@@ -8,38 +8,66 @@
       div.innerHTML = `
         <div class="text-box">
           <p class="hbd-chatbox"></p>
-          <p class="fake-btn">${section.buttonText || "Send"}</p>
+          <button class="fake-btn" type="button">${section.buttonText || "Send"}</button>
         </div>
       `;
-      // Split message into individual character spans for typing animation
       const chatbox = div.querySelector(".hbd-chatbox");
       const msg = section.message || "Happy Birthday!";
-      chatbox.innerHTML = msg
-        .split("")
-        .map((ch) => `<span>${ch}</span>`)
-        .join("");
+      chatbox.dataset.message = msg;
+      chatbox.textContent = "";
 
       container.appendChild(div);
       return div;
     },
 
     animate(tl, el) {
-      const spans = el.querySelectorAll(".hbd-chatbox span");
-      tl.from(el.querySelector(".text-box"), {
-        duration: 0.7, scale: 0.2, opacity: 0,
+      const message = el.querySelector(".hbd-chatbox");
+      const btn = el.querySelector(".fake-btn");
+      const chars = [...(message.dataset.message || "")];
+      const typing = { count: 0 };
+
+      if (!el._sendHandlerAttached) {
+        btn.addEventListener("click", () => {
+          if (!btn.classList.contains("is-ready")) return;
+          btn.classList.remove("is-ready");
+          gsap.set(btn, { pointerEvents: "none" });
+          tl.resume();
+        });
+        el._sendHandlerAttached = true;
+      }
+
+      tl.call(() => btn.classList.remove("is-ready"))
+      .set(btn, { pointerEvents: "none" })
+      .call(() => {
+        typing.count = 0;
+        message.textContent = "";
       })
-      .from(el.querySelector(".fake-btn"), {
-        duration: 0.3, scale: 0.2, opacity: 0,
+      .from(el.querySelector(".text-box"), {
+        duration: 1, scale: 0.97, opacity: 0, y: 12, ease: "power2.out",
       })
-      .to(spans, {
-        duration: 1.5, visibility: "visible", stagger: 0.05,
+      .from(btn, {
+        duration: 0.8, opacity: 0, y: 8, ease: "power2.out",
+      }, "-=0.2")
+      .to(typing, {
+        duration: Math.max(chars.length * 0.055, 1.2),
+        count: chars.length,
+        ease: "none",
+        onUpdate: () => {
+          message.textContent = chars.slice(0, Math.round(typing.count)).join("");
+        },
       })
-      .to(el.querySelector(".fake-btn"), {
-        duration: 0.1, backgroundColor: "rgb(127, 206, 248)",
-      }, "+=4")
+      .call(() => {
+        message.textContent = chars.join("");
+      })
+      .to(btn, {
+        duration: 0.25, backgroundColor: "rgba(228, 201, 149, 0.88)",
+      })
+      .set(btn, { pointerEvents: "auto" })
+      .call(() => btn.classList.add("is-ready"))
+      .addPause()
       .to(el.querySelector(".text-box"), {
-        duration: 0.5, scale: 0.2, opacity: 0, y: -150,
-      }, "+=1");
+        duration: 0.8, scale: 0.99, opacity: 0, y: -12, ease: "power2.inOut",
+      }, "+=0.2");
     },
   };
 })();

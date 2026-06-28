@@ -8,7 +8,6 @@
       div.innerHTML = `
         <h1 class="greeting-title">
           ${section.title || "Hi"}
-          <span class="greeting-name">${config.name}</span>
         </h1>
         <p class="greeting-subtitle">${section.subtitle || ""}</p>
       `;
@@ -18,17 +17,17 @@
 
     animate(tl, el) {
       tl.from(el.querySelector(".greeting-title"), {
-        duration: 0.7, opacity: 0, y: 10,
+        duration: 1.1, opacity: 0, y: 12, ease: "power2.out",
       })
       .from(el.querySelector(".greeting-subtitle"), {
-        duration: 0.4, opacity: 0, y: 10,
-      })
+        duration: 0.9, opacity: 0, y: 12, ease: "power2.out",
+      }, "-=0.25")
       .to(el.querySelector(".greeting-title"), {
-        duration: 0.7, opacity: 0, y: 10,
+        duration: 0.8, opacity: 0, y: -12, ease: "power2.inOut",
       }, "+=3.5")
       .to(el.querySelector(".greeting-subtitle"), {
-        duration: 0.7, opacity: 0, y: 10,
-      }, "-=1");
+        duration: 0.8, opacity: 0, y: -12, ease: "power2.inOut",
+      }, "-=0.7");
     },
   };
 })();

@@ -12,10 +12,10 @@
 
     animate(tl, el) {
       tl.from(el.querySelector("p"), {
-        duration: 0.7, opacity: 0, y: 10,
+        duration: 1, opacity: 0, y: 12, ease: "power2.out",
       })
       .to(el.querySelector("p"), {
-        duration: 0.7, opacity: 0, y: 10,
+        duration: 0.8, opacity: 0, y: -12, ease: "power2.inOut",
       }, "+=3");
     },
   };
