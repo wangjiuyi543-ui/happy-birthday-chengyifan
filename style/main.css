@@ -261,6 +261,14 @@ body::after {
   overflow: visible;
 }
 
+.chatbox-hint {
+  color: var(--ink);
+  opacity: 0;
+  font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+  margin-top: 0.6rem;
+  transform: translateY(8px);
+}
+
 .text-box {
   position: relative;
   text-align: center;

@@ -88,6 +88,14 @@
       }
 
       container.appendChild(div);
+      
+      // Hint text below balloons
+      const hint = document.createElement("p");
+      hint.className = "balloon-hint";
+      hint.textContent = "还没完呢，再等等 ✨";
+      hint.style.cssText = "position:absolute;bottom:12%;left:50%;transform:translateX(-50%);color:var(--ink);font-size:clamp(0.8rem,2vw,1rem);opacity:0;z-index:10;white-space:nowrap;";
+      div.appendChild(hint);
+      
       return div;
     },
 
@@ -120,6 +128,12 @@
         );
       });
 
+      // Show hint after 3 seconds
+      const hint = el.querySelector(".balloon-hint");
+      if (hint) {
+        gsap.to(hint, { opacity: 0.8, duration: 1, delay: 3 });
+      }
+      
       // 在主 timeline 上停留 8 秒，让用户看气球
       tl.to({}, { duration: 8 });
     },

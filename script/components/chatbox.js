@@ -10,6 +10,7 @@
           <p class="hbd-chatbox"></p>
           <button class="fake-btn" type="button">${section.buttonText || "Send"}</button>
         </div>
+        <p class="chatbox-hint">👆 点击发送继续</p>
       `;
       const chatbox = div.querySelector(".hbd-chatbox");
       const msg = section.message || "Happy Birthday!";
@@ -23,6 +24,7 @@
     animate(tl, el) {
       const message = el.querySelector(".hbd-chatbox");
       const btn = el.querySelector(".fake-btn");
+      const hint = el.querySelector(".chatbox-hint");
       const chars = [...(message.dataset.message || "")];
       const typing = { count: 0 };
 
@@ -30,6 +32,7 @@
         btn.addEventListener("click", () => {
           if (!btn.classList.contains("is-ready")) return;
           btn.classList.remove("is-ready");
+          hint.style.opacity = "0";
           gsap.set(btn, { pointerEvents: "none" });
           tl.resume();
         });
@@ -38,6 +41,7 @@
 
       tl.call(() => btn.classList.remove("is-ready"))
       .set(btn, { pointerEvents: "none" })
+      .set(hint, { opacity: 0 })
       .call(() => {
         typing.count = 0;
         message.textContent = "";
@@ -64,6 +68,7 @@
       })
       .set(btn, { pointerEvents: "auto" })
       .call(() => btn.classList.add("is-ready"))
+      .to(hint, { duration: 0.5, opacity: 1, y: 0 }, "-=0.2")
       .addPause()
       .to(el.querySelector(".text-box"), {
         duration: 0.8, scale: 0.99, opacity: 0, y: -12, ease: "power2.inOut",
