@@ -61,7 +61,7 @@
       div.style.zIndex = "2";
 
       const isMobile = window.innerWidth <= 768;
-      const count = isMobile ? Math.floor((section.count || 15) * 0.5) : (section.count || 15);
+      const count = isMobile ? Math.floor((section.count || 12) * 0.35) : (section.count || 15);
 
       for (let i = 0; i < count; i++) {
         const size = 50 + Math.random() * 70; // 50-120px
@@ -104,12 +104,14 @@
       const items = el.querySelectorAll(".balloon-item");
       if (!items.length) return;
 
-      // 启动气球循环飘动（独立动画）
+      // 启动气球循环飘动（独立动画），手机端减量减速
       items.forEach((item) => {
-        const duration = 2 + Math.random() * 2; // 2-4s
+        const isMobile = window.innerWidth <= 768;
+        const duration = isMobile ? 3 + Math.random() * 3 : 2 + Math.random() * 2; // 手机 3-6s, 电脑 2-4s
         const sway = (Math.random() - 0.5) * 60;
         const rotation = (Math.random() - 0.5) * 16;
         const delay = Math.random() * 1.5;
+        const repeatDelay = isMobile ? 1 + Math.random() * 3 : Math.random() * 2;
 
         gsap.fromTo(
           item,
@@ -123,7 +125,7 @@
             ease: "sine.inOut",
             delay: delay,
             repeat: -1,
-            repeatDelay: Math.random() * 2,
+            repeatDelay: repeatDelay,
           }
         );
       });
